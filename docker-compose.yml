@@ -1,0 +1,37 @@
+version: '1'
+
+services:
+	postgres:
+		image: postgres:9.6
+		container_name: postgres
+		environment:
+			POSTGRES_USER: insurance
+			POSTGRES_PASSWORD: J5brHrAXFLQSif0K
+			POSTGRES_DB: insurance
+
+	insurance:
+		build: .
+		image: chamaconekt/insurance
+		links:
+		- postgres
+		container_name: insurance
+		depends_on:
+			- postgres
+		environment:
+
+	nginx:
+		image: nginx:1.11.11-alpine
+		links:
+			- insurance
+		container_name: nginx
+		command: nginx -g 'daemon off;' -c /etc/insurance-nginx/nginx.conf
+		depends_on:
+			- insurance
+		ports:
+			- 80:80
+		volumes_from:
+			- insurance
+
+volumes:
+	insurance-static-files:
+		driver:local
